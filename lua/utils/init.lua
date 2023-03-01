@@ -10,6 +10,7 @@ M.servers = {
   "jsonls",
   "yamlls",
   "terraform_lsp",
+  "clojure_lsp",
 }
 
 return M
