@@ -1,13 +1,15 @@
 local M = {
-  "navarasu/onedark.nvim"
-  commit = "8ef51924724d506e515f2d3ac9f959a9eaf38f3d",
+  "navarasu/onedark.nvim",
   lazy = false,    -- make sure we load this during startup if it is your main colorscheme
   priority = 1000, -- make sure to load this before all the other start plugins
 }
 
 function M.config()
-  local status_ok, _ = pcall(vim.cmd.colorscheme, M.name)
-  if not status_ok then
+  local colorscheme = "onedark"
+  local ok, _ = pcall(vim.cmd, "colorscheme " .. colorscheme)
+  vim.o.background = "dark" -- or "light" for light mode
+  if not ok then
+    vim.notify("colorscheme " .. colorscheme .. " not found!")
     return
   end
 end

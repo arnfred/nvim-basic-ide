@@ -5,7 +5,7 @@ local M = {
     },
 }
 
-M.config = {
+M.opts = {
     keymaps = {
         submit = "<C-s>",
         close = "<C-q>"
