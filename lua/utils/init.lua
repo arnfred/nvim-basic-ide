@@ -9,7 +9,7 @@ M.servers = {
   "bashls",
   "jsonls",
   "yamlls",
-  "terraform_lsp",
+  "terraformls",
   "clojure_lsp",
 }
 
