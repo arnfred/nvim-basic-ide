@@ -3,6 +3,7 @@ local M = {
     dependencies = {
         { "MunifTanjim/nui.nvim" }
     },
+    lazy = false,
 }
 
 M.opts = {
