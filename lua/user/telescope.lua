@@ -12,6 +12,7 @@ local M = {
 }
 
 local actions = require "telescope.actions"
+vim.api.nvim_set_keymap("n", "<leader>fr", "<cmd>Telescope resume<cr>", { noremap = true })
 
 M.opts = {
   defaults = {
