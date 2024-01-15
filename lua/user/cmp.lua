@@ -157,6 +157,7 @@ function M.config()
     },
     sources = {
       { name = "nvim_lsp" },
+      { name = "copilot" },
       { name = "nvim_lua" },
       { name = "luasnip" },
       { name = "buffer" },
