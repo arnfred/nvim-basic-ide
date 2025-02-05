@@ -5,6 +5,7 @@ M.servers = {
   "tsserver",
   "pyright",
   "bashls",
+  "gopls",
   "jsonls",
   "yamlls",
   "terraformls",

@@ -1,115 +1,141 @@
 local M = {
-  "neovim/nvim-lspconfig",
-  commit = "649137cbc53a044bffde36294ce3160cb18f32c7",
-  lazy = true,
-  dependencies = {
-    {
-      "hrsh7th/cmp-nvim-lsp",
-      commit = "0e6b2ed705ddcff9738ec4ea838141654f12eeef",
+    "neovim/nvim-lspconfig",
+    tag = "v1.6.0",
+    lazy = true,
+    dependencies = {
+        {
+            "hrsh7th/cmp-nvim-lsp",
+        },
     },
-  },
+    event = { 'BufReadPre', 'BufNewFile' },
 }
 
-local cmp_nvim_lsp = require "cmp_nvim_lsp"
 function M.config()
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  capabilities = cmp_nvim_lsp.default_capabilities(M.capabilities)
 
-  local function lsp_keymaps(bufnr)
-    local opts = { noremap = true, silent = true }
-    local keymap = vim.api.nvim_buf_set_keymap
-    keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-    keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-    keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-	keymap(bufnr, "n", "R", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
-	keymap(bufnr, "n", "T", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
-    keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-    keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-    keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
-    keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<cr>", opts)
-    keymap(bufnr, "n", "<leader>lI", "<cmd>Mason<cr>", opts)
-    keymap(bufnr, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
-    keymap(bufnr, "n", "<leader>lj", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", opts)
-    keymap(bufnr, "n", "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", opts)
-    keymap(bufnr, "n", "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
-	keymap(bufnr, "n", "<leader>lt",  "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
-    keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-    keymap(bufnr, "n", "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
-  end
+    local function lsp_keymaps(bufnr)
+        local opts = { noremap = true, silent = true }
+        local keymap = vim.api.nvim_buf_set_keymap
 
-  local lspconfig = require "lspconfig"
-  local on_attach = function(client, bufnr)
-    if client.name == "tsserver" then
-      client.server_capabilities.documentFormattingProvider = false
+        -- See function references in telescope:
+        keymap(bufnr, "n", "gr", "<cmd>lua require('telescope.builtin').lsp_references()<CR>", opts)
+        vim.keymap.set('n', '<leader>fu', function() require('telescope.builtin').lsp_references() end)
+
+        -- See diagnositcs in telescope for current buffer
+        keymap(bufnr, "n", "<leader>t", "<cmd>lua require('telescope.builtin').diagnostics({ bufnr = 0 })<CR>", opts)
+        vim.keymap.set('n', '<leader>fd', function() require('telescope.builtin').diagnostics({ bufnr = 0 }) end)
+
+        -- See all diagnostics in telescope
+        vim.keymap.set('n', '<leader>T', function() require('telescope.builtin').diagnostics() end)
+
+        -- Goto the implementation of the word under the cursor if there's only one, otherwise show all options in Telescope
+        keymap(bufnr, "n", "gi", "<cmd>lua require('telescope.builtin').lsp_implementations()<CR>", opts)
+        vim.keymap.set('n', '<leader>fi', function() require('telescope.builtin').lsp_implementations() end)
+
+        -- Goto the definition of the word under the cursor, if there's only one, otherwise show all options in Telescope
+        keymap(bufnr, "n", "gd", "<cmd>lua require('telescope.builtin').lsp_definitions()<CR>", opts)
+        vim.keymap.set('n', '<leader>fd', function() require('telescope.builtin').lsp_definitions() end)
+
+        -- Goto the definition of the type of the word under the cursor, if there's only one, otherwise show all options in Telescope
+        keymap(bufnr, "n", "gt", "<cmd>lua require('telescope.builtin').lsp_type_definitions()<CR>", opts)
+        vim.keymap.set('n', '<leader>fd', function() require('telescope.builtin').lsp_type_definitions() end)
+
+        -- Lists LSP incoming calls for word under the cursor
+        keymap(bufnr, "n", "gc", "<cmd>lua require('telescope.builtin').lsp_incoming_calls()<CR>", opts)
+        vim.keymap.set('n', '<leader>fc', function() require('telescope.builtin').lsp_outgoing_calls() end)
+
+        -- Lists LSP outgoing calls for word under the cursor
+        keymap(bufnr, "n", "gC", "<cmd>lua require('telescope.builtin').lsp_incoming_calls()<CR>", opts)
+        vim.keymap.set('n', '<leader>fC', function() require('telescope.builtin').lsp_outgoing_calls() end)
+
+        -- Lists LSP document symbols in the current buffer
+        keymap(bufnr, "n", "gs", "<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>", opts)
+        vim.keymap.set('n', '<leader>fs', function() require('telescope.builtin').lsp_document_symbols(require('telescope.themes').get_dropdown {
+            winblend = 10,
+            previewer = false,
+        }) end)
+
+        -- Goto top level abstract declaration of function/method
+        keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
+
+        -- Show tooltip with types
+        keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+
+        -- Global rename symbol
+        keymap(bufnr, "n", "R", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
+
     end
 
-    if client.name == "sumneko_lua" then
-      client.server_capabilities.documentFormattingProvider = false
+    local lspconfig = require("lspconfig")
+
+
+    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
+
+    local on_attach = function(client, bufnr)
+        lsp_keymaps(bufnr)
+        require("illuminate").on_attach(client)
     end
 
-    lsp_keymaps(bufnr)
-    require("illuminate").on_attach(client)
-  end
-
-  for _, server in pairs(require("utils").servers) do
-    Opts = {
-      on_attach = on_attach,
-      capabilities = capabilities,
+    local opts = {
+        on_attach = on_attach,
+        capabilities = capabilities,
+    }
+    local lua_opts = {
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+            Lua = {
+                diagnostics = {
+                    -- Get the language server to recognize the `vim` global
+                    globals = {'vim'},
+                },
+            }
+        },
     }
 
-    server = vim.split(server, "@")[1]
+    lspconfig.lua_ls.setup(lua_opts)
+    lspconfig.cssls.setup(opts)
+    lspconfig.html.setup(opts)
+    lspconfig.ts_ls.setup(opts)
+    lspconfig.pyright.setup(opts)
+    lspconfig.bashls.setup(opts)
+    lspconfig.gopls.setup(opts)
+    lspconfig.jsonls.setup(opts)
+    lspconfig.yamlls.setup(opts)
+    lspconfig.terraformls.setup(opts)
+    lspconfig.clojure_lsp.setup(opts)
 
-    local require_ok, conf_opts = pcall(require, "settings." .. server)
-    if require_ok then
-      Opts = vim.tbl_deep_extend("force", conf_opts, Opts)
+    local signs = {
+        { name = "DiagnosticSignError", text = "" },
+        { name = "DiagnosticSignWarn", text = "" },
+        { name = "DiagnosticSignHint", text = "" },
+        { name = "DiagnosticSignInfo", text = "" },
+    }
+
+    for _, sign in ipairs(signs) do
+        vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
     end
 
-    lspconfig[server].setup(Opts)
-  end
+    local config = {
+        signs = {
+            active = signs,
+        },
+        update_in_insert = false,
+        underline = true,
+        severity_sort = true,
+        float = {
+            focusable = false,
+            style = "minimal",
+            border = "rounded",
+            source = "always",
+            header = "",
+            prefix = "",
+            suffix = "",
+        },
+    }
 
-  local signs = {
-    { name = "DiagnosticSignError", text = "" },
-    { name = "DiagnosticSignWarn", text = "" },
-    { name = "DiagnosticSignHint", text = "" },
-    { name = "DiagnosticSignInfo", text = "" },
-  }
-
-  for _, sign in ipairs(signs) do
-    vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
-  end
-
-  local config = {
-    -- disable virtual text
-    virtual_text = false,
-    -- show signs
-    signs = {
-      active = signs,
-    },
-    update_in_insert = true,
-    underline = true,
-    severity_sort = true,
-    float = {
-      focusable = false,
-      style = "minimal",
-      border = "rounded",
-      source = "always",
-      header = "",
-      prefix = "",
-      suffix = "",
-    },
-  }
-
-  vim.diagnostic.config(config)
-
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-    border = "rounded",
-  })
-
-  vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-    border = "rounded",
-  })
+    vim.diagnostic.config(config)
 end
 
 return M
-

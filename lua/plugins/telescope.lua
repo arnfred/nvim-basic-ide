@@ -15,11 +15,11 @@ local M = {
 }
 
 M.keys = {
-    { "<leader>fr", ":Telescope resume<CR>", desc = 'Previous Search' },
-    { "<leader>ff", ":Telescope find_files<CR>", desc = 'File Serach' },
-    { "<leader>FF", ":Telescope find_files no_ignore=true hidden=true<CR>", desc = "Hidden File Search" },
-    { "<leader>fg", ":Telescope live_grep<CR>", desc = "String Search" },
-    { 
+    { "<leader>fr", "<cmd>Telescope resume<CR>", desc = 'Previous Search' },
+    { "<leader>ff", "<cmd>Telescope find_files<CR>", desc = 'File Serach' },
+    { "<leader>FF", "<cmd>Telescope find_files no_ignore=true hidden=true<CR>", desc = "Hidden File Search" },
+    { "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "String Search" },
+    {
         "<leader>fb",
         function()
             require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {

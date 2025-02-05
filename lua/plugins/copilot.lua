@@ -2,6 +2,9 @@ local M = {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
+    dependencies = {
+        'hrsh7th/nvim-cmp',
+    },
 }
 
 function M.config()
@@ -19,26 +22,7 @@ function M.config()
                 keymap = {
                     -- Disable the built-in mapping, we'll configure it in nvim-cmp.
                     accept = false,
-                    accept_word = '<c-n>',
-                    accept_line = "<c-l>",
-                    next = "<c-j>",
-                    prev = "<c-k>",
-                    dismiss = "<c-h>",
-                    -- Enable Copilot suggestion? 
-                    
-                    
-
                 },
-            },
-            filetypes = {
-                markdown = true,
-                help = false,
-                gitcommit = false,
-                gitrebase = false,
-                hgcommit = false,
-                svn = false,
-                cvs = false,
-                ["."] = false,
             },
         },
     }
@@ -54,6 +38,9 @@ function M.config()
             copilot.dismiss()
         end
         set_trigger(false)
+    end)
+    cmp.event:on('menu_closed', function()
+        set_trigger(true)
     end)
 end
 

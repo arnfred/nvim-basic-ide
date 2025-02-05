@@ -1,5 +1,8 @@
 local M = {
   "folke/snacks.nvim",
+  priority = 1000,
+  tag = 'v2.18.0',
+  lazy = false,
   ---@type snacks.Config
   opts = {
     indent = {
